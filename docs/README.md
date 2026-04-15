@@ -243,3 +243,41 @@ DEBIT Transaction Flow:
 ## Conclusion
 
 The school accounting system demonstrates a well-structured COBOL application with clear separation between user interface (main), business logic (operations), and data management (data) layers. This modular design makes it suitable for maintenance and future enhancements, particularly in modernization efforts to integrate with contemporary database systems and web interfaces.
+## Data Flow Diagram
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Main as main.cob
+    participant Ops as operations.cob
+    participant Data as data.cob
+
+    User->>Main: Select option (View/Credit/Debit)
+    Main->>Ops: Send operation type
+
+    alt View Balance
+        Ops->>Data: READ balance
+        Data-->>Ops: Return balance
+        Ops-->>Main: Display balance
+    else Credit Account
+        Ops->>Data: READ balance
+        Data-->>Ops: Current balance
+        Ops->>Ops: Add credit amount
+        Ops->>Data: WRITE new balance
+        Data-->>Ops: Confirmation
+        Ops-->>Main: Show updated balance
+    else Debit Account
+        Ops->>Data: READ balance
+        Data-->>Ops: Current balance
+        Ops->>Ops: Validate funds
+        alt Sufficient funds
+            Ops->>Data: WRITE new balance
+            Data-->>Ops: Confirmation
+            Ops-->>Main: Show updated balance
+        else Insufficient funds
+            Ops-->>Main: Error message
+        end
+    end
+
+    Main-->>User: Show result
+```
